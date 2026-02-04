@@ -64,11 +64,11 @@ st.divider()
 # --- INVIO NUOVO MESSAGGIO ---
 with st.expander("🆕 SCRIVI UN NUOVO MESSAGGIO"):
     destinatario = st.selectbox("PER CHI?", ["TUTTE LE SEDI", "Roma Nord", "Roma Sud", "Milano"])
-    testo = st.text_area("Cosa vuoi comunicare?", placeholder="Es: Password Wi-Fi cambiata in: 12345... oppure: Gino arriva alle 15:00")
+    testo = st.text_area("Cosa vuoi comunicare?", placeholder="Es: Password Wi-Fi cambiata... oppure: Gino arriva alle 15:00")
     
-    if st.button("PUBBLICA IN BACHECA 📌", type="primary"):
+    if st.button("PUBLICA IN BACHECA 📌", type="primary"):
         if not testo:
-            st.warning("Non puoi inviare un messaggio vuoto!")
+            st.warning("Il messaggio è vuoto!")
         else:
             with st.spinner("Invio in corso..."):
                 sheet = get_bacheca()
@@ -85,15 +85,13 @@ st.write("### 📢 ULTIME COMUNICAZIONI")
 # --- LETTURA BACHECA ---
 sheet = get_bacheca()
 if sheet:
-    # Leggiamo tutto e trasformiamo in lista di dizionari
     data = sheet.get_all_records()
     if data:
-        # Filtriamo per mostrare solo i messaggi destinati alla mia sede o a tutte
-        # E mostriamo solo gli ultimi 10 per non appesantire
         df = pd.DataFrame(data)
+        # Filtriamo per pertinenza
         messaggi_rilevanti = df[(df['Per_Sede'] == "TUTTE LE SEDI") | (df['Per_Sede'] == mia_sede)]
         
-        # Invertiamo l'ordine per avere i più recenti in alto
+        # Mostriamo gli ultimi 10 invertiti
         per_visualizzare = messaggi_rilevanti.tail(10).iloc[::-1]
 
         for _, m in per_visualizzare.iterrows():
@@ -104,14 +102,20 @@ if sheet:
             </div>
             """, unsafe_allow_html=True)
     else:
-        st.info("La bacheca è vuota. Sii il primo a scrivere!")
+        st.info("La bacheca è vuota.")
 
-# --- FOOTER ---
+# =================================================================
+# 4. AREA TITOLARE E FOOTER
+# =================================================================
 st.write("")
 st.write("---")
+st.write("### 📊 AREA AMMINISTRAZIONE")
+st.link_button("📂 APRI ARCHIVIO COMPLETO (Google Sheets)", st.secrets["private_gsheets_url"])
+
+st.write("")
 st.markdown(f"""
-    <div style="text-align: center;">
-        <p style="font-weight:bold; margin-bottom:5px;">SuPeR | Logistics Hub</p>
+    <div style="text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
+        <p style="font-weight:bold; margin-bottom:5px;">Daniele Salvatori | Logistica</p>
         <a href="https://wa.me/393929334563" style="color: #25D366; text-decoration: none; font-weight: bold;">💬 ASSISTENZA WHATSAPP</a><br><br>
         <div style="color: #888; font-size: 12px;">
             Powered by <a href="https://www.superstart.it" target="_blank" style="color: #b00000; text-decoration: none; font-weight: bold;">SuPeR</a> & Streamlit
